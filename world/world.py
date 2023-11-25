@@ -36,6 +36,7 @@ class World:
     # Отрисовка результата
     def plot(self, animated: bool):
         fig, ax = plt.subplots()
+        fig.set_size_inches(8, 8)
         ax.set_aspect(x_boundary / y_boundary)
         ax.set_xlim(0, x_boundary)
         ax.set_ylim(0, y_boundary)
