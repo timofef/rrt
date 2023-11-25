@@ -19,7 +19,7 @@ def main(path: str, animated: bool, precision: float, step: float, max_nodes: in
 
     # Ищем путь
     print()
-    world.rrt.search(precision, step, max_nodes)
+    world.rrt.search(animated, precision, step, max_nodes)
     print()
 
     # Рисуем найденный путь

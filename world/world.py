@@ -22,7 +22,7 @@ class World:
 
         # Препятствия
         self.obstacles = []
-        for i in range(3, len(raw_world_data) - 1):
+        for i in range(3, len(raw_world_data)):
             vertices = []
             for j in range(len(raw_world_data[i]['points'])):
                 vertices.append(shapely.Point(raw_world_data[i]['points'][j]['x'],
@@ -75,7 +75,7 @@ class World:
                 frames[i].set_data([node.x for node in self.rrt.history[i]],
                                    [node.y for node in self.rrt.history[i]])
             ani = animation.FuncAnimation(fig, anim, frames=frames_num, interval=5000/frames_num)
-            # ani.save('animation.gif', writer='imagemagick', fps=30)
+            ani.save('animation.gif', writer='imagemagick', fps=100)
 
         ax.set_title('Всего узлов: ' + str(self.rrt.graph.number_of_nodes()))
 

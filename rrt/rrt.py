@@ -27,7 +27,7 @@ class RRT:
 
         self.history = []
 
-    def search(self, precision: float, step_size: float, max_nodes: int):
+    def search(self, animated: bool, precision: float, step_size: float, max_nodes: int):
         random.seed(10)
         self.precision = precision
         node_count = 1
@@ -42,7 +42,8 @@ class RRT:
             self.graph.add_node(new_node)
             self.graph.add_edge(nearest_node, new_node, weight=step)
 
-            self.history.append((new_node, nearest_node))
+            if animated:
+                self.history.append((new_node, nearest_node))
 
             node_count += 1
 
