@@ -1,0 +1,65 @@
+import networkx
+import networkx as nx
+import shapely
+import matplotlib.pyplot as plt
+
+from rrt.rrt import RRT
+
+x_boundary = 100
+y_boundary = 100
+
+
+class World:
+    def __init__(self, raw_world_data):
+        # Границы поля
+        self.x_boundary = x_boundary
+        self.y_boundary = y_boundary
+
+        # Стартовая и терминальная точка
+        self.start_point = shapely.Point(raw_world_data[1]['x'], raw_world_data[1]['y'])
+        self.terminal_point = shapely.Point(raw_world_data[2]['x'], raw_world_data[2]['y'])
+
+        # Препятствия
+        self.obstacles = []
+        for i in range(3, len(raw_world_data) - 1):
+            vertices = []
+            for j in range(len(raw_world_data[i]['points'])):
+                vertices.append(shapely.Point(raw_world_data[i]['points'][j]['x'],
+                                                    raw_world_data[i]['points'][j]['y']))
+            self.obstacles.append(shapely.Polygon(vertices))
+
+        self.rrt = RRT(self.start_point, self.terminal_point,
+                       self.x_boundary, self.y_boundary,
+                       self.obstacles)
+
+    # Отрисовка результата
+    def plot(self):
+        fig, ax = plt.subplots()
+        ax.set_aspect(x_boundary / y_boundary)
+        ax.set_xlim(0, x_boundary)
+        ax.set_ylim(0, y_boundary)
+
+        # Препятствия
+        for obstacle in self.obstacles:
+            ax.fill(*obstacle.exterior.xy, fc='#999999', ec='black')
+
+        # RRT
+        edges = [e for e in self.rrt.graph.edges]
+        for edge in edges:
+            ax.plot([edge[0].x, edge[1].x], [edge[0].y, edge[1].y], color='black', linewidth=0.5)
+
+        # Найденный путь
+        if self.rrt.success:
+            path = networkx.astar_path(self.rrt.graph, self.rrt.start_point, self.rrt.terminal_point)
+            for i in range(len(path) - 1):
+                ax.plot([path[i].x, path[i+1].x], [path[i].y, path[i+1].y], color='red', linewidth=1)
+                ax.scatter([path[i].x, path[i+1].x], [path[i].y, path[i+1].y], color='red', s=2)
+
+        # Стартовая и терминальная вершины
+        ax.scatter(*self.start_point.xy, fc='green')
+        ax.add_patch(plt.Circle((self.terminal_point.x, self.terminal_point.x), self.rrt.precision, color='black', fill=False))
+        ax.scatter(*self.terminal_point.xy, fc='red')
+
+        ax.set_title('Всего узлов: ' + str(self.rrt.graph.number_of_nodes()))
+
+        plt.show()
