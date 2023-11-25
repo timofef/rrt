@@ -75,7 +75,7 @@ class World:
                 frames[i].set_data([node.x for node in self.rrt.history[i]],
                                    [node.y for node in self.rrt.history[i]])
             ani = animation.FuncAnimation(fig, anim, frames=frames_num, interval=5000/frames_num)
-            ani.save('animation.gif', writer='imagemagick', fps=100)
+            # ani.save('animation.gif', writer='imagemagick', fps=100)
 
         ax.set_title('Всего узлов: ' + str(self.rrt.graph.number_of_nodes()))
 
