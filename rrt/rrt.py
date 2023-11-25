@@ -23,13 +23,14 @@ class RRT:
         self.obstacles = obstacles
 
         self.success = False
-
         self.precision = 0
+
+        self.history = []
 
     def search(self, precision: float, step_size: float, max_nodes: int):
         random.seed(10)
         self.precision = precision
-        node_count = 0
+        node_count = 1
         success = False
         while not (success or node_count >= max_nodes):
             new_point = self.generate_point()
@@ -41,9 +42,11 @@ class RRT:
             self.graph.add_node(new_node)
             self.graph.add_edge(nearest_node, new_node, weight=step)
 
+            self.history.append((new_node, nearest_node))
+
             node_count += 1
 
-            if shapely.distance(new_node, self.goal) < precision:
+            if shapely.distance(new_node, self.goal) < self.precision:
                 self.terminal_point = new_node
                 success = True
 

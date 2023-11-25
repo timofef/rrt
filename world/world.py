@@ -2,6 +2,7 @@ import networkx
 import networkx as nx
 import shapely
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 from rrt.rrt import RRT
 
@@ -33,32 +34,48 @@ class World:
                        self.obstacles)
 
     # Отрисовка результата
-    def plot(self):
+    def plot(self, animated: bool):
         fig, ax = plt.subplots()
         ax.set_aspect(x_boundary / y_boundary)
         ax.set_xlim(0, x_boundary)
         ax.set_ylim(0, y_boundary)
+        frames_num = len(self.rrt.history)+1 if self.rrt.success else len(self.rrt.history)
+
+        # Стартовая и терминальная вершины
+        ax.scatter(*self.start_point.xy, fc='green')
+        ax.add_patch(
+            plt.Circle((self.terminal_point.x, self.terminal_point.y), self.rrt.precision, color='black', fill=False))
+        ax.scatter(*self.terminal_point.xy, fc='red')
 
         # Препятствия
         for obstacle in self.obstacles:
             ax.fill(*obstacle.exterior.xy, fc='#999999', ec='black')
 
         # RRT
-        edges = [e for e in self.rrt.graph.edges]
-        for edge in edges:
-            ax.plot([edge[0].x, edge[1].x], [edge[0].y, edge[1].y], color='black', linewidth=0.5)
+        if animated:
+            frames = [ax.plot([], [], color='black', linewidth=0.5)[0]
+                      for i in range(len(self.rrt.history))]
+        else:
+            edges = [e for e in self.rrt.graph.edges]
+            for edge in edges:
+                ax.plot([edge[0].x, edge[1].x], [edge[0].y, edge[1].y], color='black', linewidth=0.5)
 
         # Найденный путь
         if self.rrt.success:
             path = networkx.astar_path(self.rrt.graph, self.rrt.start_point, self.rrt.terminal_point)
-            for i in range(len(path) - 1):
-                ax.plot([path[i].x, path[i+1].x], [path[i].y, path[i+1].y], color='red', linewidth=1)
-                ax.scatter([path[i].x, path[i+1].x], [path[i].y, path[i+1].y], color='red', s=2)
+            if animated:
+                self.rrt.history.append(tuple([node for node in path]))
+                frames.append(ax.plot([], [], color='red', linewidth=1)[0])
+            else:
+                for i in range(len(path) - 1):
+                    ax.plot([path[i].x, path[i+1].x], [path[i].y, path[i+1].y], color='red', linewidth=1)
+                    # ax.scatter([path[i].x, path[i+1].x], [path[i].y, path[i+1].y], color='red', s=3)
 
-        # Стартовая и терминальная вершины
-        ax.scatter(*self.start_point.xy, fc='green')
-        ax.add_patch(plt.Circle((self.terminal_point.x, self.terminal_point.x), self.rrt.precision, color='black', fill=False))
-        ax.scatter(*self.terminal_point.xy, fc='red')
+        if animated:
+            anim = lambda x: frames[x].set_data([node.x for node in self.rrt.history[x]],
+                                                [node.y for node in self.rrt.history[x]])
+            ani = animation.FuncAnimation(fig, anim, frames=frames_num, interval=1)
+            # ani.save('animation.gif', writer='imagemagick', fps=30)
 
         ax.set_title('Всего узлов: ' + str(self.rrt.graph.number_of_nodes()))
 
