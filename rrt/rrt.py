@@ -49,9 +49,8 @@ class RRT:
             if shapely.distance(new_node, self.goal) < self.precision:
                 self.terminal_point = new_node
                 success = True
-
+            print("Total nodes: " + str(node_count), end='\r')
         self.success = success
-        print(node_count)
 
     def generate_point(self):
         while True:

@@ -69,12 +69,12 @@ class World:
             else:
                 for i in range(len(path) - 1):
                     ax.plot([path[i].x, path[i+1].x], [path[i].y, path[i+1].y], color='red', linewidth=1)
-                    # ax.scatter([path[i].x, path[i+1].x], [path[i].y, path[i+1].y], color='red', s=3)
 
         if animated:
-            anim = lambda x: frames[x].set_data([node.x for node in self.rrt.history[x]],
-                                                [node.y for node in self.rrt.history[x]])
-            ani = animation.FuncAnimation(fig, anim, frames=frames_num, interval=1)
+            def anim(i):
+                frames[i].set_data([node.x for node in self.rrt.history[i]],
+                                   [node.y for node in self.rrt.history[i]])
+            ani = animation.FuncAnimation(fig, anim, frames=frames_num, interval=5000/frames_num)
             # ani.save('animation.gif', writer='imagemagick', fps=30)
 
         ax.set_title('Всего узлов: ' + str(self.rrt.graph.number_of_nodes()))
