@@ -2,6 +2,7 @@ import random
 
 import networkx as nx
 import shapely
+from shapely.ops import nearest_points
 import numpy as np
 
 
@@ -38,14 +39,13 @@ class RRT:
             new_node, step = self.get_new_node(nearest_node, new_point, step_size)
             if new_node is None:
                 continue
+            node_count += 1
 
             self.graph.add_node(new_node)
             self.graph.add_edge(nearest_node, new_node, weight=step)
 
             if animated:
                 self.history.append((new_node, nearest_node))
-
-            node_count += 1
 
             if shapely.distance(new_node, self.goal) < self.precision:
                 self.terminal_point = new_node
@@ -65,26 +65,20 @@ class RRT:
                     break
             if not is_inside_obstacle:
                 break
+
         return point
 
-    def find_nearest_node(self, point: shapely.Point):
-        nearest = None
-        min_dist = 10000.
+    def find_nearest_node(self, point: shapely.Point) -> shapely.Point:
+        nearest = nearest_points(point, shapely.MultiPoint(list(self.graph.nodes)))
 
-        for node in self.graph.nodes:
-            dist = shapely.distance(point, node)
-            if dist < min_dist:
-                min_dist = dist
-                nearest = node
-
-        return nearest
+        return nearest[1]
 
     def get_new_node(self, near: shapely.Point, rand: shapely.Point, step_size: float):
-        dist = np.sqrt(np.square(rand.x - near.x) + np.square(rand.y - near.y))
-        x_direction = (rand.x - near.x) / dist
-        y_direction = (rand.y - near.y) / dist
+        dist = shapely.distance(near, rand)
+        x_direction = rand.x - near.x
+        y_direction = rand.y - near.y
 
-        step = min(dist, step_size)
+        step = min(dist, step_size) / dist
         new_node = shapely.Point(near.x + x_direction * step, near.y + y_direction * step)
 
         for obstacle in self.obstacles:

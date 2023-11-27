@@ -1,4 +1,4 @@
-import sys, json, argparse
+import sys, json, argparse, time
 
 from world.world import World
 
@@ -19,8 +19,10 @@ def main(path: str, animated: bool, precision: float, step: float, max_nodes: in
 
     # Ищем путь
     print()
+    start = time.time()
     world.rrt.search(animated, precision, step, max_nodes)
-    print()
+    end = time.time()
+    print("Elapsed time: " + str(end-start) + "s")
 
     # Рисуем найденный путь
     world.plot(animated)
