@@ -27,14 +27,16 @@ class RRT:
         self.precision = 0
 
         self.history = []
+        self.global_counter = 1
 
-    def search(self, animated: bool, precision: float, step_size: float, max_nodes: int):
+    def search(self, animated: bool, precision: float, step_size: float, max_nodes: int, bias: int):
         random.seed(10)
         self.precision = precision
         node_count = 1
         success = False
         while not (success or node_count >= max_nodes):
-            new_point = self.generate_point()
+            self.global_counter += 1
+            new_point = self.generate_point(bias)
             nearest_node = self.find_nearest_node(new_point)
             new_node, step = self.get_new_node(nearest_node, new_point, step_size)
             if new_node is None:
@@ -53,7 +55,10 @@ class RRT:
             print("Total nodes: " + str(node_count), end='\r')
         self.success = success
 
-    def generate_point(self):
+    def generate_point(self, bias: int):
+        if bias != 1:
+            if self.global_counter % bias == 0:
+                return self.goal
         while True:
             x = random.uniform(0, self.x_boundary)
             y = random.uniform(0, self.y_boundary)
