@@ -30,7 +30,7 @@ class RRT:
         self.global_counter = 1
 
     def search(self, animated: bool, precision: float, step_size: float, max_nodes: int, bias: int):
-        random.seed(10)
+        random.seed(15)
         self.precision = precision
         node_count = 1
         success = False
@@ -53,6 +53,7 @@ class RRT:
                 self.terminal_point = new_node
                 success = True
             print("Total nodes: " + str(node_count), end='\r')
+        print("Total nodes: " + str(node_count))
         self.success = success
 
     def generate_point(self, bias: int):
