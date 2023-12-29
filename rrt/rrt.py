@@ -29,11 +29,21 @@ class RRT:
         self.history = []
         self.global_counter = 1
 
-    def search(self, animated: bool, precision: float, step_size: float, max_nodes: int, bias: int):
+        self.density_limit = 0
+        self.density_grid = 0
+        self.grid = None
+
+    def search(self, animated: bool, precision: float, step_size: float, max_nodes: int, bias: int, density_limit: int,
+                 density_grid: int):
         random.seed(15)
         self.precision = precision
         node_count = 1
         success = False
+        grid_size = self.x_boundary // density_grid
+        self.density_limit = density_limit
+        self.density_grid = density_grid
+        self.grid = np.zeros([grid_size, grid_size], dtype=int)
+
         while not (success or node_count >= max_nodes):
             self.global_counter += 1
             new_point = self.generate_point(bias)
@@ -47,7 +57,7 @@ class RRT:
             self.graph.add_edge(nearest_node, new_node, weight=step)
 
             if animated:
-                self.history.append((new_node, nearest_node))
+                self.history.append((new_node, nearest_node, self.history))
 
             if shapely.distance(new_node, self.goal) < self.precision:
                 self.terminal_point = new_node
@@ -91,5 +101,11 @@ class RRT:
             crosses_obstacle = shapely.intersects(shapely.LineString([near, new_node]), obstacle)
             if crosses_obstacle:
                 return None, step
+
+        grid_x, grid_y = int((new_node.x / self.x_boundary) * len(self.grid)), int((new_node.y / self.y_boundary) * len(self.grid))
+        if self.grid[grid_x][grid_y] + 1 > self.density_limit:
+            return None, step
+        else:
+            self.grid[grid_x][grid_y] += 1
 
         return new_node, step

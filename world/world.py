@@ -1,5 +1,6 @@
 import networkx
 import networkx as nx
+import numpy.random
 import shapely
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -42,6 +43,14 @@ class World:
         ax.set_ylim(0, y_boundary)
         frames_num = len(self.rrt.history)+1 if self.rrt.success else len(self.rrt.history)
 
+        if not animated:
+            for i in range(len(self.rrt.grid) - 1):
+                for j in range(len(self.rrt.grid) - 1):
+                    if self.rrt.grid[i][j] == self.rrt.density_limit:
+                        xs = [el * self.rrt.density_grid for el in [i, i+1, i+1, i]]
+                        ys = [el * self.rrt.density_grid for el in [j, j, j+1, j+1]]
+                        ax.fill(xs, ys, 'r', alpha=0.2, edgecolor='r')
+
         # Стартовая и терминальная вершины
         ax.scatter(*self.start_point.xy, fc='green')
         ax.add_patch(
@@ -76,7 +85,6 @@ class World:
                 frames[i].set_data([node.x for node in self.rrt.history[i]],
                                    [node.y for node in self.rrt.history[i]])
             ani = animation.FuncAnimation(fig, anim, frames=frames_num, interval=5000/frames_num)
-            # ani.save('animation.gif', writer='imagemagick', fps=100)
 
         ax.set_title('Всего узлов: ' + str(self.rrt.graph.number_of_nodes()))
 
