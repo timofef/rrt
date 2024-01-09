@@ -1,0 +1,156 @@
+// step 1    dg 2   dl 3
+Total nodes: 2326
+Attempted nodes: 7690
+Elapsed time: 21.156409978866577s
+
+Total nodes: 1871
+Attempted nodes: 5519
+Elapsed time: 12.320313930511475s
+
+otal nodes: 2178
+Attempted nodes: 7073
+Elapsed time: 17.45485782623291s
+
+Total nodes: 2151
+Attempted nodes: 5745
+Elapsed time: 14.980682134628296s
+
+Total nodes: 1794
+Attempted nodes: 5927
+Elapsed time: 12.383236169815063s
+
+Total nodes: 2351
+Attempted nodes: 6920
+Elapsed time: 19.82506489753723s
+
+
+
+// step 2    dg 4   dl 5
+Total nodes: 1146
+Attempted nodes: 3199
+Elapsed time: 4.55644416809082s
+
+Total nodes: 1089
+Attempted nodes: 2880
+Elapsed time: 4.15275764465332s
+
+Total nodes: 999
+Attempted nodes: 2801
+Elapsed time: 3.4131410121917725s
+
+Total nodes: 1076
+Attempted nodes: 3648
+Elapsed time: 4.598706960678101s
+
+Total nodes: 1036
+Attempted nodes: 2730
+Elapsed time: 3.7607219219207764s
+
+Total nodes: 1086
+Attempted nodes: 2856
+Elapsed time: 3.8652138710021973s
+
+
+
+// step 4    dg 5   dl 5
+Total nodes: 602
+Attempted nodes: 1651
+Elapsed time: 1.3245770931243896s
+
+Total nodes: 801
+Attempted nodes: 1958
+Elapsed time: 2.2730278968811035s
+
+Total nodes: 683
+Attempted nodes: 1771
+Elapsed time: 1.5829088687896729s
+
+Total nodes: 612
+Attempted nodes: 1574
+Elapsed time: 1.3252429962158203s
+
+Total nodes: 473
+Attempted nodes: 1325
+Elapsed time: 0.8478591442108154s
+
+Total nodes: 554
+Attempted nodes: 1416
+Elapsed time: 1.0599112510681152s
+
+
+// step 6    dg 10   dl 10
+Total nodes: 384
+Attempted nodes: 1045
+Elapsed time: 0.5947580337524414s
+
+Total nodes: 358
+Attempted nodes: 967
+Elapsed time: 0.5389738082885742s
+
+Total nodes: 506
+Attempted nodes: 1153
+Elapsed time: 0.8062849044799805s
+
+Total nodes: 457
+Attempted nodes: 1098
+Elapsed time: 0.7178821563720703s
+
+Total nodes: 567
+Attempted nodes: 1694
+Elapsed time: 1.4986751079559326s
+
+Total nodes: 332
+Attempted nodes: 1122
+Elapsed time: 0.5560557842254639s
+
+
+// step 8    dg 10   dl 10
+Total nodes: 309
+Attempted nodes: 1085
+Elapsed time: 0.505730152130127s
+
+Total nodes: 319
+Attempted nodes: 762
+Elapsed time: 0.3929719924926758s
+
+Total nodes: 421
+Attempted nodes: 1130
+Elapsed time: 0.706305742263794s
+
+Total nodes: 496
+Attempted nodes: 1151
+Elapsed time: 0.7906479835510254s
+
+Total nodes: 348
+Attempted nodes: 801
+Elapsed time: 0.43871092796325684s
+
+Total nodes: 205
+Attempted nodes: 684
+Elapsed time: 0.2511019706726074s
+
+
+// step 10    dg 25   dl 25
+Total nodes: 177
+Attempted nodes: 476
+Elapsed time: 0.17202997207641602s
+
+Total nodes: 272
+Attempted nodes: 596
+Elapsed time: 0.2839200496673584s
+
+Total nodes: 289
+Attempted nodes: 789
+Elapsed time: 0.395916223526001s
+
+Total nodes: 337
+Attempted nodes: 917
+Elapsed time: 0.43395209312438965s
+
+Total nodes: 312
+Attempted nodes: 1007
+Elapsed time: 0.5155730247497559s
+
+Total nodes: 279
+Attempted nodes: 839
+Elapsed time: 0.38649797439575195s

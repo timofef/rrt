@@ -32,10 +32,13 @@ class RRT:
         self.density_limit = 0
         self.density_grid = 0
         self.grid = None
+        self.last_inserted = start
+
+        self.mode = 0
 
     def search(self, animated: bool, precision: float, step_size: float, max_nodes: int, bias: int, density_limit: int,
                  density_grid: int):
-        random.seed(15)
+        random.seed(9)
         self.precision = precision
         node_count = 1
         success = False
@@ -46,33 +49,59 @@ class RRT:
 
         while not (success or node_count >= max_nodes):
             self.global_counter += 1
-            new_point = self.generate_point(bias)
-            nearest_node = self.find_nearest_node(new_point)
-            new_node, step = self.get_new_node(nearest_node, new_point, step_size)
-            if new_node is None:
-                continue
-            node_count += 1
+            # Обычный RRT
+            if self.mode == 0:
+                new_point = self.generate_point(bias)
+                nearest_node = self.find_nearest_node(new_point)
+                new_node, step, changed_cell, on_finish = self.get_new_node(nearest_node, new_point, step_size)
+                if new_node is None:
+                    continue
+                node_count += 1
+
+                if on_finish:
+                    self.mode = 1
+
+            # Финишная прямая
+            elif self.mode == 1:
+                if shapely.distance(self.goal, self.last_inserted) > self.precision + step_size:
+                    dist = shapely.distance(self.goal, self.last_inserted)
+                    x_direction = self.goal.x - self.last_inserted.x
+                    y_direction = self.goal.y - self.last_inserted.y
+                    step = min(dist, step_size) / dist
+                    new_node = shapely.Point(self.last_inserted.x + x_direction * step, self.last_inserted.y + y_direction * step)
+                else:
+                    new_node = self.goal
+                nearest_node = self.last_inserted
+                node_count += 1
 
             self.graph.add_node(new_node)
             self.graph.add_edge(nearest_node, new_node, weight=step)
+            self.last_inserted = new_node
 
             if animated:
-                self.history.append((new_node, nearest_node, self.history))
+                self.history.append(((new_node, nearest_node), changed_cell))
 
             if shapely.distance(new_node, self.goal) < self.precision:
                 self.terminal_point = new_node
                 success = True
             print("Total nodes: " + str(node_count), end='\r')
         print("Total nodes: " + str(node_count))
+        print("Attempted nodes: " + str(self.global_counter))
         self.success = success
 
     def generate_point(self, bias: int):
         if bias != 1:
             if self.global_counter % bias == 0:
                 return self.goal
+
+        free_spaces = np.nonzero(self.density_grid > self.grid)
+
         while True:
-            x = random.uniform(0, self.x_boundary)
-            y = random.uniform(0, self.y_boundary)
+            rand_index = random.randint(0, len(free_spaces[0]) - 1)
+            grid_cell_x, grid_cell_y = free_spaces[0][rand_index], free_spaces[1][rand_index]
+            x = (random.uniform(0, 1) + grid_cell_x) * self.density_grid
+            y = (random.uniform(0, 1) + grid_cell_y) * self.density_grid
+
             point = shapely.Point(x, y)
             is_inside_obstacle = False
             for obstacle in self.obstacles:
@@ -100,12 +129,21 @@ class RRT:
         for obstacle in self.obstacles:
             crosses_obstacle = shapely.intersects(shapely.LineString([near, new_node]), obstacle)
             if crosses_obstacle:
-                return None, step
+                return None, step, None, False
 
+        on_finish = True
+        for obstacle in self.obstacles:
+            if shapely.intersects(shapely.LineString([self.goal, new_node]), obstacle):
+                on_finish = False
+                break
+
+        changed_cell = None
         grid_x, grid_y = int((new_node.x / self.x_boundary) * len(self.grid)), int((new_node.y / self.y_boundary) * len(self.grid))
         if self.grid[grid_x][grid_y] + 1 > self.density_limit:
-            return None, step
+            return None, step, None, False
         else:
             self.grid[grid_x][grid_y] += 1
+            if self.grid[grid_x][grid_y] == self.density_limit:
+                changed_cell = (grid_x, grid_y)
 
-        return new_node, step
+        return new_node, step, changed_cell, on_finish

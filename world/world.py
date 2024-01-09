@@ -1,5 +1,6 @@
 import networkx
 import networkx as nx
+import numpy as np
 import numpy.random
 import shapely
 import matplotlib.pyplot as plt
@@ -43,14 +44,6 @@ class World:
         ax.set_ylim(0, y_boundary)
         frames_num = len(self.rrt.history)+1 if self.rrt.success else len(self.rrt.history)
 
-        if not animated:
-            for i in range(len(self.rrt.grid) - 1):
-                for j in range(len(self.rrt.grid) - 1):
-                    if self.rrt.grid[i][j] == self.rrt.density_limit:
-                        xs = [el * self.rrt.density_grid for el in [i, i+1, i+1, i]]
-                        ys = [el * self.rrt.density_grid for el in [j, j, j+1, j+1]]
-                        ax.fill(xs, ys, 'r', alpha=0.2, edgecolor='r')
-
         # Стартовая и терминальная вершины
         ax.scatter(*self.start_point.xy, fc='green')
         ax.add_patch(
@@ -63,8 +56,8 @@ class World:
 
         # RRT
         if animated:
-            frames = [ax.plot([], [], color='black', linewidth=0.5)[0]
-                      for i in range(len(self.rrt.history))]
+            tree_frames = [ax.plot([], [], color='black', linewidth=0.5)[0] for i in range(len(self.rrt.history))]
+            grid_frames = [None for i in range(frames_num)]
         else:
             edges = [e for e in self.rrt.graph.edges]
             for edge in edges:
@@ -75,16 +68,30 @@ class World:
             path = networkx.astar_path(self.rrt.graph, self.rrt.start_point, self.rrt.terminal_point)
             if animated:
                 self.rrt.history.append(tuple([node for node in path]))
-                frames.append(ax.plot([], [], color='red', linewidth=1)[0])
+                tree_frames.append(ax.plot([], [], color='red', linewidth=1)[0])
             else:
                 for i in range(len(path) - 1):
                     ax.plot([path[i].x, path[i+1].x], [path[i].y, path[i+1].y], color='red', linewidth=1)
 
         if animated:
             def anim(i):
-                frames[i].set_data([node.x for node in self.rrt.history[i]],
-                                   [node.y for node in self.rrt.history[i]])
+                tree_frames[i].set_data([node.x for node in self.rrt.history[i][0]],
+                                        [node.y for node in self.rrt.history[i][0]])
+                if self.rrt.history[i][1] is not None:
+                    k = self.rrt.history[i][1][0]
+                    j = self.rrt.history[i][1][1]
+                    xs = [el * self.rrt.density_grid for el in [k, k + 1, k + 1, k]]
+                    ys = [el * self.rrt.density_grid for el in [j, j, j + 1, j + 1]]
+                    grid_frames[i] = ax.fill(xs, ys, 'r', alpha=0.06, edgecolor='r')[0]
             ani = animation.FuncAnimation(fig, anim, frames=frames_num, interval=5000/frames_num)
+
+        if not animated:
+            for i in range(len(self.rrt.grid) - 1):
+                for j in range(len(self.rrt.grid) - 1):
+                    if self.rrt.grid[i][j] == self.rrt.density_limit:
+                        xs = [el * self.rrt.density_grid for el in [i, i+1, i+1, i]]
+                        ys = [el * self.rrt.density_grid for el in [j, j, j+1, j+1]]
+                        ax.fill(xs, ys, 'r', alpha=0.06, edgecolor='r')
 
         ax.set_title('Всего узлов: ' + str(self.rrt.graph.number_of_nodes()))
 

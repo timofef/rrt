@@ -39,7 +39,7 @@ if __name__ == '__main__':
     parser.add_argument("-p", "--precision", default=3, help="Погрешность конечной вершины", type=float)
     parser.add_argument("-a", "--animated", action="store_true", help="Показать анимацию")
     parser.add_argument("-b", "--bias", default=1, help="Bias", type=int)
-    parser.add_argument("-dl", "--density_limit", default=-1, help="Предельная плотность, при которой можно вставить новый узел", type=int)
+    parser.add_argument("-dl", "--density_limit", default=-1, help="Предельная плотность, при которой можно вставить новый узел", type=float)
     parser.add_argument("-dg", "--density_grid", default=-1, help="dfghjk", type=int)
     parser.add_argument("file", help="JSON file")
     args = parser.parse_args()
@@ -51,4 +51,4 @@ if __name__ == '__main__':
          args.max_nodes,
          args.bias,
          args.density_limit,
-         args.density_limit)
+         args.density_grid)
